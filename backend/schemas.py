@@ -2,41 +2,16 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
-class CandidateBase(BaseModel):
-    name: Optional[str] = None
-    email: Optional[str] = None
-    phone: Optional[str] = None
+# Resume Upload Schemas
+class ResumeUploadResponse(BaseModel):
+    candidate_id: int
+    name: Optional[str]
+    email: Optional[str]
+    phone: Optional[str]
+    skills: Optional[List[str]]
+    message: str
 
-class CandidateCreate(CandidateBase):
-    pass
-
-class CandidateResponse(CandidateBase):
-    id: int
-    resume_filename: Optional[str] = None
-    resume_text: Optional[str] = None
-    linkedin_url: Optional[str] = None
-    github_url: Optional[str] = None
-    misc_links: Optional[List[str]] = []
-    linkedin_data: Optional[Dict[str, Any]] = None
-    github_data: Optional[Dict[str, Any]] = None
-    misc_data: Optional[List[Dict[str, Any]]] = None
-    skills: Optional[List[str]] = []
-    education: Optional[List[Dict[str, Any]]] = []
-    experience: Optional[List[Dict[str, Any]]] = []
-    match_score: Optional[float] = None
-    job_description: Optional[str] = None
-    approved: bool = False
-    recruiter_notes: Optional[str] = None
-    interview_scheduled: bool = False
-    interview_date: Optional[datetime] = None
-    interview_notes: Optional[str] = None
-    feedback_summary: Optional[str] = None
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-    
-    class Config:
-        from_attributes = True
-
+# Job Match Schemas
 class JobMatchRequest(BaseModel):
     candidate_id: int
     job_description: str
@@ -44,28 +19,72 @@ class JobMatchRequest(BaseModel):
 class JobMatchResponse(BaseModel):
     candidate_id: int
     match_score: float
-    analysis: str
+    message: str
 
-class ProfileFetchRequest(BaseModel):
+# Profile Intelligence Schemas
+class ProfileIntelligenceRequest(BaseModel):
     candidate_id: int
 
-class ProfileFetchResponse(BaseModel):
+class ProfileIntelligenceResponse(BaseModel):
     candidate_id: int
-    linkedin_data: Optional[Dict[str, Any]] = None
-    github_data: Optional[Dict[str, Any]] = None
-    misc_data: Optional[List[Dict[str, Any]]] = None
+    linkedin_data: Optional[Dict[str, Any]]
+    github_data: Optional[Dict[str, Any]]
+    misc_data: Optional[List[Dict[str, Any]]]
     summary: str
 
+# Candidate Schemas
+class CandidateBase(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+
+class CandidateResponse(BaseModel):
+    id: int
+    name: Optional[str]
+    email: Optional[str]
+    phone: Optional[str]
+    resume_filename: Optional[str]
+    linkedin_url: Optional[str]
+    github_url: Optional[str]
+    misc_links: Optional[List[str]]
+    linkedin_data: Optional[Dict[str, Any]]
+    github_data: Optional[Dict[str, Any]]
+    misc_data: Optional[List[Dict[str, Any]]]
+    skills: Optional[List[str]]
+    education: Optional[List[Dict[str, Any]]]
+    experience: Optional[List[Dict[str, Any]]]
+    match_score: Optional[float]
+    approved: bool
+    rejected: bool
+    scheduled_interview: Optional[str]
+    feedback_summary: Optional[str]
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+# Approval Schemas
 class ApprovalRequest(BaseModel):
     candidate_id: int
     approved: bool
-    recruiter_notes: Optional[str] = None
 
+class ApprovalResponse(BaseModel):
+    candidate_id: int
+    approved: bool
+    message: str
+
+# Interview Scheduling Schemas
 class ScheduleInterviewRequest(BaseModel):
     candidate_id: int
-    interview_date: datetime
-    notes: Optional[str] = None
+    interview_slot: Optional[str] = None  # If None, return suggestions
 
+class ScheduleInterviewResponse(BaseModel):
+    candidate_id: int
+    suggested_slots: Optional[List[str]]
+    scheduled_slot: Optional[str]
+    message: str
+
+# Feedback Schemas
 class FeedbackRequest(BaseModel):
     candidate_id: int
     interview_notes: str
@@ -73,3 +92,11 @@ class FeedbackRequest(BaseModel):
 class FeedbackResponse(BaseModel):
     candidate_id: int
     feedback_summary: str
+    message: str
+
+# Update Candidate Schema
+class CandidateUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    skills: Optional[List[str]] = None
